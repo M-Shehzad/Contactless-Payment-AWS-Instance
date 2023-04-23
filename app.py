@@ -10,11 +10,13 @@ model = tf.keras.models.load_model('./model/0000001')
 
 table = boto3.resource('dynamodb',region_name='ap-south-1').Table('palmPrints')
 
-def putDynamoDB(item):
+def putDynamoDB(imageName, vector):
     try:
+        item = {'imageName': imageName, 'vector': vector}
         table.put_item(Item=item)
         return True
-    except Exception:
+    except Exception as e:
+        print(e)
         return False
 
 @app.route('/')
@@ -31,8 +33,9 @@ def predict():
     imageName = data['imageName']
 
     prediction = model.predict(image)
+    predictionString = ",".join([str(i) for i in prediction])
     
-    DBstatus = putDynamoDB({'imageName':imageName,'vector':prediction.tolist()})
+    DBstatus = putDynamoDB(imageName,predictionString)
 
     return json.dumps({'prediction': prediction.tolist(), 'DBstatus': DBstatus})
 
