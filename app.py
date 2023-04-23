@@ -40,5 +40,10 @@ def predict():
 
     return json.dumps({'prediction': prediction, 'DBstatus': DBstatus})
 
+@app.route('/getAllVectors', methods=['GET'])
+def getAllVectors():
+    response = table.scan()
+    return json.dumps(response['Items'])
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8888)
