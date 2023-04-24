@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, request, Response
 import boto3
+import tarfile
 import numpy as np
 import json
 import tensorflow as tf
@@ -7,6 +8,14 @@ import time
 from uuid import uuid4
 
 app = Flask(__name__)
+
+
+s3 = boto3.client('s3', region_name='ap-south-1')
+s3.download_file('final-year-project-gb15', 'saved_model/hod_model.tar.gz', './model/model.tar.gz')
+tar = tarfile.open('./model/model.tar.gz')
+tar.extractall('./model/')
+tar.close()
+
 
 model = tf.keras.models.load_model('./model/0000001')
 
